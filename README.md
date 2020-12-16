@@ -5,6 +5,7 @@ https://www.calculatorsoup.com/calculators/conversions/numberstowords.php
 User must input number to convert to words, currency or check writing
 
 Examples:
+
 Words:
 | Number    | Output |
 | ------    | ------ |
