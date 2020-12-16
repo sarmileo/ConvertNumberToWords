@@ -14,25 +14,51 @@ option = input("Select: ")
 
 url = ""
 if option == "1":
-    url = f'https://www.calculatorsoup.com/calculators/conversions/numberstowords.php?number={number}&letter_case=lowercase&action=solve'
+    format = ""
 elif option == "2":
-    url = f'https://www.calculatorsoup.com/calculators/conversions/numberstowords.php?number={number}&format=currency&letter_case=lowercase&action=solve'
+    format = "&format=currency"
 elif option == "3":
-    url = f'https://www.calculatorsoup.com/calculators/conversions/numberstowords.php?number={number}&format=check&letter_case=lowercase&action=solve'
+    format = "&format=check"
+    
+url = f'https://www.calculatorsoup.com/calculators/conversions/numberstowords.php?number={number}{format}&letter_case=lowercase&action=solve'
+
 resp = req.get(url)
 
-pattern = "<div id=\"answer\" class=\"still\"><br>([a-z\s\-\.]+)<\/div>"
-patternCheckWriting = "<div id=\"answer\" class=\"still\"><br>([a-z\s\-]+)<br><strong>or<\/strong><br> ([a-z\s\-\/\d]+)<\/div>"
-#print(resp.text) # Printing response
+# pattern for option 1 and 2, for option 3 with float values
+pattern1 = "<div id=\"answer\" class=\"still\"><br>([\w\s\/\-]*)<\/div>"
+#pattern for option 3 with integer values
+pattern2 = "<div id=\"answer\" class=\"still\"><br>([\w\s\-]*)<br><strong>or<\/strong><br> ([\w\s\-\/]*)<\/div>"
 
+pattern = ""
+result = ""
+numberInWords = ""
+
+#check for option 1 or 2
 if option == "1" or option == "2":
+    pattern = pattern1
+    numberInWords = re.search(pattern1, resp.text)
+#check for option 3 and if the number is not integer
+elif option == "3" and number != int(number):
+    pattern = pattern1
     numberInWords = re.search(pattern, resp.text)
-    print()
-    print(numberInWords[1])
-if option == "3":
-    numberInWords = re.search(patternCheckWriting, resp.text)
-    print()
-    print(numberInWords[1] + "\n or \n" + numberInWords[2])
+#check for option 3 if the number is integer
+elif option == "3":
+    pattern = pattern2
+    numberInWords = re.search(pattern, resp.text)
+
+#result for pattern1 has group 1
+#result for pattern2 has group 1 and 2
+if pattern == pattern1:
+    result = numberInWords[1]
+if pattern == pattern2:
+    result = f"{numberInWords[1]}\n or\n{numberInWords[2]}"
+
+print()
+print(result)
+
+filename = "numberToWords.txt"
+with open(filename, "w") as file:
+    file.write(result)
 
 
 
